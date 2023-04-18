@@ -155,5 +155,13 @@ class Game(var players: List[Player], var deck: Deck, var round: Int) {
     }
   }
 
+  for (i <- 1 to 11) {
+    val newWins = new Game(players, deck, 12 - i).play()
+
+    for (p <- players) {
+      wins += (p.name -> (wins(p.name) + newWins(p.name)))
+    }
+  }
+
   println(wins)
 }
