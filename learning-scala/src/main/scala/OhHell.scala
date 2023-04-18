@@ -61,10 +61,14 @@ class Game(var players: List[Player], var deck: Deck, var round: Int) {
     println("Round " + round)
     println("Trump Suit is " + deck.trumpSuit());
 
-    playRound(players.head)
+    var nextLeader = players.head
+    for (i <- 1 to round) {
+      println("Trick " + i)
+      nextLeader = playRound(nextLeader)
+    }
   }
 
-  def playRound(leadPlayer: Player) = {
+  def playRound(leadPlayer: Player): Player = {
     println("Lead Player is " + leadPlayer.name)
     println("Lead Player's hand is " + leadPlayer.hand)
 
@@ -114,6 +118,8 @@ class Game(var players: List[Player], var deck: Deck, var round: Int) {
     }
 
     println(bestPlayer.name + " wins the round with " + bestCard)
+
+    bestPlayer
   }
 }
 
@@ -128,5 +134,5 @@ class Game(var players: List[Player], var deck: Deck, var round: Int) {
     Player("Dave", List())
   )
 
-  new Game(players, deck, 1).play()
+  new Game(players, deck, 2).play()
 }
