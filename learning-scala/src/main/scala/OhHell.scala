@@ -54,23 +54,31 @@ class Deck(var cards: List[Card] = List()) {
 }
 
 class Game(var players: List[Player], var deck: Deck, var round: Int) {
-  def play(): Unit = {
+  def play(): Map[String, Int] = {
     deck.makeDeck()
     players = deck.deal(players, round)
 
     println("Round " + round)
     println("Trump Suit is " + deck.trumpSuit());
 
+    var wins = Map[String, Int]()
+    for (p <- players) {
+      wins += (p.name -> 0)
+    }
+
     var nextLeader = players.head
     for (i <- 1 to round) {
       println("Trick " + i)
       nextLeader = playRound(nextLeader)
+      wins += (nextLeader.name -> (wins(nextLeader.name) + 1))
     }
+
+    wins
   }
 
   def playRound(leadPlayer: Player): Player = {
-    println("Lead Player is " + leadPlayer.name)
-    println("Lead Player's hand is " + leadPlayer.hand)
+    //println("Lead Player is " + leadPlayer.name)
+    //println("Lead Player's hand is " + leadPlayer.hand)
 
     val index = players.indexOf(leadPlayer)
     var currIndex = index
@@ -83,18 +91,18 @@ class Game(var players: List[Player], var deck: Deck, var round: Int) {
     while (currIndex != index + players.size) {
       if (currIndex == index) {
         val card = leadPlayer.playRound("");
-        println("Lead Player leads " + card);
+        //println("Lead Player leads " + card);
 
         leadSuit = card.suit
         bestCard = card
         bestPlayer = leadPlayer
       } else {
         val currPlayer = players(currIndex % players.size)
-        println("Next player is " + currPlayer.name)
-        println(currPlayer.name + "'s hand is " + currPlayer.hand)
+        //println("Next player is " + currPlayer.name)
+        //println(currPlayer.name + "'s hand is " + currPlayer.hand)
 
         val card = players(currIndex % players.size).playRound(leadSuit)
-        println(currPlayer.name + " plays " + card)
+        //println(currPlayer.name + " plays " + card)
 
         if (card.suit == deck.trumpSuit()) {
           if (bestCard.suit != deck.trumpSuit()) {
@@ -134,5 +142,18 @@ class Game(var players: List[Player], var deck: Deck, var round: Int) {
     Player("Dave", List())
   )
 
-  new Game(players, deck, 2).play()
+  var wins = Map[String, Int]()
+  for (p <- players) {
+    wins += (p.name -> 0)
+  }
+
+  for (i <- 1 to 12) {
+    val newWins = new Game(players, deck, i).play()
+
+    for (p <- players) {
+      wins += (p.name -> (wins(p.name) + newWins(p.name)))
+    }
+  }
+
+  println(wins)
 }
